@@ -24,11 +24,12 @@ fn main() {
             .trim()
             .parse()
             .expect("Error, execution time argument can not be converted in a valid number.");
+
+        println!("You are going to {} your system if the battery level is equal or less to {}% and the check is done every {} seconds.", &args[3], bat_discharging_action, execution_time);
+
         // Execution time need to be miliseconds
         let execution_time = execution_time * 1000;
-
         let tick = schedule_recv::periodic_ms(execution_time);
-        println!("You are going to {} your system if the battery level is equal or less to {}% and the check is done every {} seconds.", &args[3], bat_discharging_action, execution_time/1000);
         loop {
             tick.recv().unwrap();
             battery_critical_action(bat_discharging_action, &args[3]);
@@ -40,7 +41,7 @@ fn main() {
 
     powerman 5 60 hibernate
     - Hibernate the computer when the battery level is less than 5%, the check is done every 60 seconds.
-    ")
+    ");
     }
 }
 
