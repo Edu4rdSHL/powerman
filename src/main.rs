@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 use std::process::Command;
+extern crate schedule_recv;
 
 fn main() {
     // Get user arguments, first argument is the level of battery
@@ -12,18 +13,33 @@ fn main() {
     // pass the following aguments:  5 hibernate
     let args: Vec<String> = env::args().collect();
 
-    if args.len() == 3 {
-        // Convert user agument into integer
+    if args.len() == 4 {
         let bat_discharging_action: u32 = args[1]
             .trim()
             .parse()
             .expect("Error, battery percentage capacity can not be converted in a valid number.");
-        battery_critical_action(bat_discharging_action, &args[2]);
+
+        // Convert user agument into integer
+        let execution_time: u32 = args[2]
+            .trim()
+            .parse()
+            .expect("Error, execution time argument can not be converted in a valid number.");
+        // Execution time need to be miliseconds
+        let execution_time = execution_time * 1000;
+
+        let tick = schedule_recv::periodic_ms(execution_time);
+        loop {
+            tick.recv().unwrap();
+            battery_critical_action(bat_discharging_action, &args[3]);
+        }
     } else {
         println!("Usage:
-                 powerman <Minimun level of battery before ation>, <Action>
-                 Example: powerman 5 hibernate <- hibernate the computer when the battery level is less than 5%.
-                 You need to enable powerman.timer unit.")
+    powerman <Minimun level of battery before ation> <Time in seconds to check the battery level> <Action>
+    Example:
+
+    powerman 5 60 hibernate
+    - Hibernate the computer when the battery level is less than 5%, the check is done every 60 seconds.
+    ")
     }
 }
 
