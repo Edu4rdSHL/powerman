@@ -2,6 +2,10 @@ powerman - Power Management framework for Linux written in Rust.
 
 It project is being writen, not ready for use yet.
 
+# What are the use-cases?
+
+When you want to avoid your laptop full discharging and losing your not-saved work, losing your BIOS/system time. Some laptoos doesn't send udev events when your battery is discharging, then rules doesn't work. powerman allow you to do it work easily, see the usage.
+
 # Usage
 
 `$ powerman <Minimun level of battery before ation> <Time in seconds to check the battery level> <Action>`
