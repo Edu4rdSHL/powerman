@@ -23,7 +23,7 @@ fn main() {
         println!("Usage:
                  powerman <Minimun level of battery before ation>, <Action>
                  Example: powerman 5 hibernate <- hibernate the computer when the battery level is less than 5%.
-                 You need to enable powerman.timer init.")
+                 You need to enable powerman.timer unit.")
     }
 }
 
