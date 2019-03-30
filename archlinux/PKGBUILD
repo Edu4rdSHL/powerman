@@ -1,7 +1,7 @@
 # Maintainer: Eduard Toloza <tolosaeduard@gmail.com>
 
 pkgname=powerman
-pkgver=0.1.1
+pkgver=0.1.2
 pkgrel=1
 pkgdesc='Power Management framework for Linux written in Rust..'
 arch=('x86_64')
@@ -12,9 +12,6 @@ sha512sums=('SKIP')
 
 package() {
   cd "${pkgname}-${pkgver}"
-    install -dm 755 "${pkgdir}/usr/lib/systemd/system/"
 
   install -Dm 755 bin/"${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
-  install -Dm 755 README.md "${pkgdir}/usr/share/doc/${pkgname}/README"
-  cp "${pkgname}".{service,timer} "${pkgdir}/usr/lib/systemd/system/"
 }
