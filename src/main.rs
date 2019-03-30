@@ -28,6 +28,7 @@ fn main() {
         let execution_time = execution_time * 1000;
 
         let tick = schedule_recv::periodic_ms(execution_time);
+        println!("You are going to {} your system if the battery level is equal or less to {}% and the check is done every {} seconds.", &args[3], bat_discharging_action, execution_time/1000);
         loop {
             tick.recv().unwrap();
             battery_critical_action(bat_discharging_action, &args[3]);
