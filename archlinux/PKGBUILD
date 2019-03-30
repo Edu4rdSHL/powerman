@@ -14,5 +14,5 @@ package() {
   cd "${pkgname}-${pkgver}"
 
   install -Dm 755 bin/"${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
-  install -Dm 644 ${pkgname}.service "${pkgdir}/usr/lib/systemd/system/"
+  install -Dm 644 ${pkgname}.service "${pkgdir}/usr/lib/systemd/system/${pkgname}"
 }
