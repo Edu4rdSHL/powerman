@@ -1,0 +1,10 @@
+[Unit]
+ Description=Check for battery status every minute.
+
+[Timer]
+ OnBootSec=1min
+ OnUnitActiveSec=1min
+ Unit=powerman.service
+
+[Install]
+ WantedBy=timers.target
