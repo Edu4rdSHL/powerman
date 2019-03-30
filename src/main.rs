@@ -28,21 +28,31 @@ fn main() {
 }
 
 fn battery_critical_action(percentage: u32, action: &str) {
-    // Path battery capacity percentage
+    // Path for battery capacity percentage, battery charging status and systemd
     let battery_capacity_path = "/sys/class/power_supply/BAT0/capacity";
+    let battery_charging_path = "/sys/class/power_supply/BAT0/status";
     let systemctl_path = "/usr/bin/systemctl";
 
     // Check if systemd and BAT0 device exist
-    if Path::new(&battery_capacity_path).exists() && Path::new(&systemctl_path).exists() {
-        // Declare variable for get battery value into string
+    if Path::new(&battery_capacity_path).exists()
+        && Path::new(&systemctl_path).exists()
+        && Path::new(&battery_charging_path).exists()
+    {
+        // Declare variables
         let mut bat_value = String::new();
+        let mut bat_charging = String::new();
 
         // Read the capacity from file
         let mut b_capacity = File::open(&battery_capacity_path).expect("Error opening file.");
+        let mut b_status = File::open(&battery_charging_path).expect("Error opening file.");
 
         // Convert percentage into string
         b_capacity
             .read_to_string(&mut bat_value)
+            .expect("Failed to read file.");
+        // Convert status into string
+        b_status
+            .read_to_string(&mut bat_charging)
             .expect("Failed to read file.");
 
         // Convert percentage into integer
@@ -51,10 +61,10 @@ fn battery_critical_action(percentage: u32, action: &str) {
             .parse()
             .expect("Error, battery percentage level can not be converted in a valid number.");
 
-        // Compare percentage and execute actions accordy to use input
-        if bat_percentage < percentage {
+        // Compare percentagei, status and execute actions accordy to use input
+        if bat_percentage <= percentage && bat_charging.trim() == "Discharging" {
             let command_action = Command::new(&systemctl_path)
-                // Get user argument 2 for action to execute
+                //Get user argument 2 for action to execute
                 .arg(&action)
                 .output()
                 .expect("Failed to execute command.");
