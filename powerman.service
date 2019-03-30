@@ -1,0 +1,12 @@
+[Unit]
+ Description=Check battery status and make actions based in arguments.
+ After=default.target
+
+[Service]
+ Type=oneshot
+ ExecStart=/usr/bin/powerman 5 60 hibernate
+ KillMode=process
+ KillSignal=SIGINT
+
+[Install]
+ WantedBy=default.target

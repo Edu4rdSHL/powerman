@@ -2,7 +2,7 @@
 
 pkgname=powerman
 pkgver=0.1.2
-pkgrel=1
+pkgrel=2
 pkgdesc='Power Management framework for Linux written in Rust..'
 arch=('x86_64')
 url='https://gitlab.com/edu4rdshl/powerman'
@@ -14,4 +14,5 @@ package() {
   cd "${pkgname}-${pkgver}"
 
   install -Dm 755 bin/"${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+  install -Dm 644 ${pkgname}.service "${pkgdir}/usr/lib/systemd/system/"
 }
