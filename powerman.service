@@ -3,7 +3,7 @@
  After=default.target
 
 [Service]
- Type=oneshot
+ Type=simple
  ExecStart=/usr/bin/powerman 5 60 hibernate
  KillMode=process
  KillSignal=SIGINT
