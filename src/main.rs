@@ -18,7 +18,7 @@ fn main() {
         let bat_discharging_action: u32 = args[1]
             .trim()
             .parse()
-            .expect("Error, battery percentage capacity can not be converted in a valid number.");
+            .expect("Error, converting minimun level of battery to a valid number.");
 
         // Convert user agument into integer
         let execution_time: u32 = args[2]
@@ -31,13 +31,36 @@ fn main() {
         // Execution time need to be miliseconds
         let execution_time = execution_time * 1000;
         let tick = schedule_recv::periodic_ms(execution_time);
+
+        let battery_charging_path = "/sys/class/power_supply/BAT0/status";
+
         let mut notification_status = String::from("Not runned");
         loop {
             tick.recv().unwrap();
-            battery_critical_action(bat_discharging_action, &args[3]);
-            while notification_status == "Not runned" {
-                notification_status = battery_notification();
-                break;
+
+            let mut bat_charging = String::new();
+            let mut b_status = File::open(&battery_charging_path).expect("Error opening file.");
+
+            b_status
+                .read_to_string(&mut bat_charging)
+                .expect("Failed to read file.");
+
+            battery_critical_action(bat_discharging_action, &bat_charging, &args[3]);
+
+            if bat_charging.trim() == "Discharging" {
+                while notification_status == "Not runned" {
+                    notification_status = battery_notification(&bat_charging);
+                    break;
+                }
+            } else if bat_charging.trim() == "Charging" && notification_status != "Not runned" {
+                Notification::new()
+                    .summary("Battery charging")
+                    .body("Battery is charging now.")
+                    .icon("battery-full-charging-symbolic")
+                    .timeout(0)
+                    .show()
+                    .unwrap();
+                notification_status = String::from("Not runned")
             }
         }
     } else {
@@ -51,32 +74,22 @@ fn main() {
     }
 }
 
-fn battery_critical_action(percentage: u32, action: &str) {
+fn battery_critical_action(percentage: u32, bat_charging: &str, action: &str) {
     // Path for battery capacity percentage, battery charging status and systemd
     let battery_capacity_path = "/sys/class/power_supply/BAT0/capacity";
-    let battery_charging_path = "/sys/class/power_supply/BAT0/status";
     let systemctl_path = "/usr/bin/systemctl";
 
     // Check if systemd and BAT0 device exist
-    if Path::new(&battery_capacity_path).exists()
-        && Path::new(&systemctl_path).exists()
-        && Path::new(&battery_charging_path).exists()
-    {
+    if Path::new(&battery_capacity_path).exists() && Path::new(&systemctl_path).exists() {
         // Declare variables
         let mut bat_value = String::new();
-        let mut bat_charging = String::new();
 
         // Read the capacity from file
         let mut b_capacity = File::open(&battery_capacity_path).expect("Error opening file.");
-        let mut b_status = File::open(&battery_charging_path).expect("Error opening file.");
 
         // Convert percentage into string
         b_capacity
             .read_to_string(&mut bat_value)
-            .expect("Failed to read file.");
-        // Convert status into string
-        b_status
-            .read_to_string(&mut bat_charging)
             .expect("Failed to read file.");
 
         // Convert percentage into integer
@@ -104,31 +117,23 @@ fn battery_critical_action(percentage: u32, action: &str) {
     }
 }
 
-fn battery_notification() -> String {
+fn battery_notification(bat_charging: &str) -> String {
     // Path for battery capacity percentage, battery charging status and systemd
     let battery_capacity_path = "/sys/class/power_supply/BAT0/capacity";
-    let battery_charging_path = "/sys/class/power_supply/BAT0/status";
 
-    let percentage_low = 20;
-    let percentage_crit = 10;
+    let percentage_crit = 60;
 
     // Check if systemd and BAT0 device exist
-    if Path::new(&battery_capacity_path).exists() && Path::new(&battery_charging_path).exists() {
+    if Path::new(&battery_capacity_path).exists() {
         // Declare variables
         let mut bat_value = String::new();
-        let mut bat_charging = String::new();
 
         // Read the capacity from file
         let mut b_capacity = File::open(&battery_capacity_path).expect("Error opening file.");
-        let mut b_status = File::open(&battery_charging_path).expect("Error opening file.");
 
         // Convert percentage into string
         b_capacity
             .read_to_string(&mut bat_value)
-            .expect("Failed to read file.");
-        // Convert status into string
-        b_status
-            .read_to_string(&mut bat_charging)
             .expect("Failed to read file.");
 
         // Convert percentage into integer
@@ -137,26 +142,11 @@ fn battery_notification() -> String {
             .parse()
             .expect("Error, battery percentage level can not be converted in a valid number.");
 
-        // Compare percentagei, status and execute actions accordy to use input
-        if bat_percentage <= percentage_low
-            && bat_percentage > percentage_crit
-            && bat_charging.trim() == "Discharging"
-        {
+        if bat_percentage <= percentage_crit && bat_charging.trim() == "Discharging" {
             Notification::new()
-                .summary("Battery level low (20%)")
-                .action("Closed", "Close")
-                .body("Please consideer charging the battery.")
-                .icon("dialog-warning")
-                .timeout(0)
-                .show()
-                .unwrap();
-            String::from("Warning")
-        } else if bat_percentage <= percentage_crit && bat_charging.trim() == "Discharging" {
-            Notification::new()
-                .summary("Battery level critical (10%)")
-                .action("Closed", "Close")
+                .summary("Battery level critical (~10%)")
                 .body("Please connect a charguer.")
-                .icon("dialog-error")
+                .icon("battery-empty-symbolic")
                 .timeout(0)
                 .show()
                 .unwrap();
