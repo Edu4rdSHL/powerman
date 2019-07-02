@@ -121,7 +121,7 @@ fn battery_notification(bat_charging: &str) -> String {
     // Path for battery capacity percentage, battery charging status and systemd
     let battery_capacity_path = "/sys/class/power_supply/BAT0/capacity";
 
-    let percentage_crit = 60;
+    let percentage_crit = 10;
 
     // Check if systemd and BAT0 device exist
     if Path::new(&battery_capacity_path).exists() {
