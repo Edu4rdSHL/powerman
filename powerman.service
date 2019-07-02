@@ -4,7 +4,7 @@
 
 [Service]
  Type=simple
- ExecStart=/usr/bin/powerman 5 60 hibernate
+ ExecStart=/usr/bin/powerman 5 30 hibernate
  KillMode=process
  KillSignal=SIGINT
 
