@@ -6,3 +6,4 @@ edition = "2018"
 
 [dependencies]
 schedule_recv = "0.1.0"
+notify-rust = "3.6.0"
