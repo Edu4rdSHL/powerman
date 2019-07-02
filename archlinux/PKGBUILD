@@ -1,18 +1,18 @@
 # Maintainer: Eduard Toloza <tolosaeduard@gmail.com>
 
 pkgname=powerman
-pkgver=0.1.2
-pkgrel=2
+pkgver=0.1.3
+pkgrel=1
 pkgdesc='Power Management framework for Linux written in Rust..'
 arch=('x86_64')
-url='https://gitlab.com/edu4rdshl/powerman'
+url='https://github.com/edu4rdshl/powerman'
 license=('GPL3')
-source=("https://gitlab.com/edu4rdshl/${pkgname}/-/archive/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+source=("https://github.com/Edu4rdSHL/$pkgname/archive/$pkgver.tar.gz")
 sha512sums=('SKIP')
 
 package() {
   cd "${pkgname}-${pkgver}"
 
   install -Dm 755 bin/"${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
-  install -Dm 644 ${pkgname}.service "${pkgdir}/usr/lib/systemd/system/${pkgname}.service"
+  install -Dm 644 ${pkgname}.service "${pkgdir}/usr/lib/systemd/user/${pkgname}.service"
 }
