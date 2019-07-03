@@ -1,6 +1,6 @@
 powerman - Power Management framework for Linux written in Rust.
 
-It project is being writen, not ready for use yet.
+It project is being writen and not full featured, if you have any request enhancement open an issue.
 
 # What are the use-cases?
 
